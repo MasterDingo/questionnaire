@@ -7,6 +7,5 @@ class AnswerSerializer(serializers.Serializer):
 
 
 class QuestionSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
     text = serializers.CharField()
-    answers = AnswerSerializer()
+    answers = AnswerSerializer(many=True)
