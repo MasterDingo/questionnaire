@@ -1,0 +1,16 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Questionnaire</title>
+</head>
+<body>
+  <div id="app">
+    <question :text="question_text" v-model="answer" v-bind:answers="answers_data" @got-answer="sendAnswer()"></question>
+    <p>Answer [[ answer ]]</p>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.js"></script>
+  <script src="{% static "js/app.js" %}"></script>
+</body>
+</html>
