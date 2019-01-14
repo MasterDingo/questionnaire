@@ -4,12 +4,22 @@
 <head>
 <meta charset="utf-8">
 <title>Questionnaire</title>
+<link rel="stylesheet" href="{% static "css/style.css" %}"
 </head>
 <body>
-  <div id="app">
-    <question :text="question_text" v-model="answer" v-bind:answers="answers_data" @got-answer="sendAnswer()"></question>
-    <p>Answer [[ answer ]]</p>
-  </div>
+  <section class="main">
+    <header>
+      <h1>Questionnaire</h1>
+    </header>
+    <div class="content" id="app">
+      <div class="overlay" v-if="loading">
+        <div class="loader">
+          <div class="spinner">Loading...</div>
+        </div>
+      </div>
+      <question :text="question_text" v-model="answer" v-bind:answers="answers_data" @got-answer="sendAnswer()" @restart-quiz="loadQuestion(0)"></question>
+    </div>
+  </section>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.js"></script>
   <script src="{% static "js/app.js" %}"></script>
 </body>

@@ -12,6 +12,9 @@ class QuestionnaireViewSet(viewsets.ViewSet):
         sess = request.session
         if question_id is None:
             question_id = sess.get("question_id", 0)
+        else:
+            if "user_path" in sess:
+                del sess["user_path"]
         sess["question_id"] = question_id
         question = Question.byId(question_id)
         if "user_path" not in sess:
@@ -29,12 +32,13 @@ class QuestionnaireViewSet(viewsets.ViewSet):
             sess["question_id"] = question.id
             if not question.answers:
                 print("{}: {}".format(sess["user_path"][0], " -> ".join(sess["user_path"][1:])))
-            serializer = QuestionSerializer(question)
-            return Response(serializer.data)
+            return Response({"next_id": question.id})
         else:
             print("->".join(sess["user_path"]))
             return Response()
 
 
-get_question = QuestionnaireViewSet.as_view({'get': 'get_question'})
-post_answer = QuestionnaireViewSet.as_view({'post': 'post_answer'})
+questions = QuestionnaireViewSet.as_view({
+        'get': 'get_question',
+        'post': 'post_answer'
+    })

@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import get_question, post_answer
+from .views import questions
 
 urlpatterns = [
-    path('question/', get_question),
-    path('answer/', post_answer),
+    path('question/', questions),
+    path('question/<int:question_id>/', questions)
 ]

@@ -31,10 +31,15 @@ Vue.component('question', {
     };
   },
   template: `
-  <div id="question">
+  <div class="question">
     <p>{{ text }}</p>
-    <answer v-for="answer in answers" :key="answer.id" :answer-value="answer.id" :text="answer.text" v-model="selectedAnswer" @input="$emit('input', selectedAnswer)"></answer>
-    <button @click="$emit('got-answer', selectedAnswer)">Choose</button>
+    <div class="answer-list">
+      <answer v-for="answer in answers" :key="answer.id" :answer-value="answer.id" :text="answer.text" v-model="selectedAnswer" @input="$emit('input', selectedAnswer)"></answer>
+    </div>
+    <div class="button">
+      <button v-if="answers.length>0" @click="$emit('got-answer', selectedAnswer)" >Choose</button>
+      <button v-if="answers.length==0" @click="$emit('restart-quiz')">Restart</button>
+    </div>
   </div>
   `
 });
@@ -45,12 +50,14 @@ var app = new Vue({
   data: {
     question_text: "The question",
     answers_data: [],
-    answer: 0
+    answer: 0,
+    loading: false
   },
   methods: {
     sendAnswer: function() {
       var vm = this;
-      fetch('http://192.168.56.101:8888/api/v1/answer/',
+      vm.loading = true;
+      fetch('http://192.168.56.101:8888/api/v1/question/',
         {
           method: 'POST',
           headers: {
@@ -63,11 +70,19 @@ var app = new Vue({
         if(response.ok)
           return response.json();
       })
-      .then(vm.parseJson);
+      .then(function(json) {
+        console.log(this);
+        vm.loadQuestion(json.next_id);
+      });
     },
-    startQuiz: function() {
+    loadQuestion: function(quest_id) {
       var vm = this;
-      fetch('http://192.168.56.101:8888/api/v1/question/')
+      var url = 'http://192.168.56.101:8888/api/v1/question/';
+      if(typeof quest_id != 'undefined') {
+        url+= quest_id+'/';
+      }
+      vm.loading = true;
+      fetch(url)
         .then((response) => {
           if(response.ok)
             return response.json();
@@ -76,13 +91,12 @@ var app = new Vue({
     },
     parseJson: function(json) {
       var vm = this;
-      console.log(json);
       vm.question_text = json.text;
       vm.answers_data = json.answers;
-      console.log(vm);
+      vm.loading = false;
     }
   },
   created: function() {
-    this.startQuiz();
+    this.loadQuestion();
   }
 });
